@@ -127,6 +127,11 @@ jobs:
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
           sed -i "s/DKSU_VERSION=11998/DKSU_VERSION=${KSU_VERSION}/" Makefile
 
+      - name: Save KernelSU Version
+        run: |
+          echo "${KSU_VERSION}" > $GITHUB_WORKSPACE/ksuver.txt
+
+
       - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
@@ -290,6 +295,13 @@ jobs:
           ZIP_NAME="${{ inputs.model }}_${{ inputs.android_version }}_${{ inputs.kernel_version }}_Next_SUSFS_AnyKernel3.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
+
+      - name: Upload KernelSU Version
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernelsu-version
+          path: ksuver.txt
+
           
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
