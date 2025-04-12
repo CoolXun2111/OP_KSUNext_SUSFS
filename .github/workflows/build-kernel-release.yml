@@ -233,21 +233,21 @@ jobs:
       REPO_NAME: OP_KSUNext_SUSFS
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RELEASE_NAME: "*TEST BUILD* OnePlus Kernels with KernelSU Next & SUSFS *TEST BUILD*"
-      RELEASE_NOTES: |
+#      RELEASE_NOTES: |
+      
+#        Module SUSFS: 
+#        -> https://github.com/sidex15/ksu_module_susfs
 
-        Module SUSFS: 
-        -> https://github.com/sidex15/ksu_module_susfs
+#        KernelSU-Next Managers:
+#        -> https://github.com/KernelSU-Next/KernelSU-Next
 
-        KernelSU-Next Managers:
-        -> https://github.com/KernelSU-Next/KernelSU-Next
-
-        Features:
-        [+] KernelSU-Next
-        [+] SUSFS v1.5.5
-        [+] Wireguard Support
-        [+] Maphide LineageOS Detections
-        [+] Futile Maphide for jit-zygote-cache Detections
-        [+] Magic Mount Support
+#        Features:
+#        [+] KernelSU-Next
+#        [+] SUSFS v1.5.5
+#        [+] Wireguard Support
+#        [+] Maphide LineageOS Detections
+#        [+] Futile Maphide for jit-zygote-cache Detections
+#        [+] Magic Mount Support
 
     steps:
       - name: Checkout code
@@ -264,6 +264,12 @@ jobs:
           KSUVER=$(cat ./ksu/ksuver.txt)
           echo "KSUVER=$KSUVER"
           echo "KSUVER=$KSUVER" >> $GITHUB_ENV
+
+      - name: Set dynamic RELEASE_NOTES
+        run: |
+          echo "RELEASE_NOTES=Module SUSFS:%0A-> https://github.com/sidex15/ksu_module_susfs%0A" >> $GITHUB_ENV
+          echo "RELEASE_NOTES+=%0AKernelSU-Next Managers:%0A-> https://github.com/KernelSU-Next/KernelSU-Next%0A" >> $GITHUB_ENV
+          echo "RELEASE_NOTES+=%0AFeatures:%0A[+] KernelSU-Next v${KSUVER}%0A[+] SUSFS v1.5.5%0A[+] Wireguard Support%0A[+] Maphide LineageOS Detections%0A[+] Futile Maphide for jit-zygote-cache Detections%0A[+] Magic Mount Support" >> $GITHUB_ENV
 
 
       - name: Generate and Create New Tag
