@@ -12,9 +12,20 @@ on:
         required: true
         type: boolean
         default: true
+      build_sm8450:
+        description: 'Build sm8450 (OP10Pro)?'
+        required: true
+        type: boolean
+        default: true
+      build_sm8750:
+        description: 'Build sm8750 (OP13)?'
+        required: true
+        type: boolean
+        default: true
 
 jobs:
-  build-sm8450: # Non Bazel Builds
+  build-sm8450:
+    if: ${{ inputs.build_sm8450 }}
     strategy:
       fail-fast: false
       matrix:
@@ -36,6 +47,7 @@ jobs:
       kernel_version: ${{ matrix.kernel_version }}
 
   build-sm8750:
+    if: ${{ inputs.build_sm8750 }}
     strategy:
       fail-fast: false
       matrix:
