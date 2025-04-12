@@ -100,22 +100,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Download KernelSU Version
+        uses: actions/download-artifact@v4
+        with:
+          name: kernelsu-version
+          path: ./ksu
+
+      - name: Read KernelSU Version
+        run: |
+          KSUVER=$(cat ./ksu/ksuver.txt)
+          echo "KSUVER=$KSUVER"
+          echo "KSUVER=$KSUVER" >> $GITHUB_ENV
+
+
       - name: Generate and Create New Tag
         run: |
-          PREFIX="v1.0.0"
-          EXISTING_TAGS=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[].name' | grep "^$PREFIX-r" || true)
-          if [ -z "$EXISTING_TAGS" ]; then
-            NEW_TAG="$PREFIX-r0"
-          else
-            LAST_SUFFIX=$(echo "$EXISTING_TAGS" | sed "s/^$PREFIX-r//" | sort -n | tail -n1)
-            NEXT_SUFFIX=$((LAST_SUFFIX + 1))
-            NEW_TAG="$PREFIX-r$NEXT_SUFFIX"
-          fi
-          echo "New tag: $NEW_TAG"
-          echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
+          KSUVER="${{ env.KSUVER }}"
 
+          EXISTING=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[].name' | grep "^$KSUVER" || true)
+
+          if [ -z "$EXISTING" ]; then
+            NEW_TAG="${KSUVER}-r0"
+          else
+            LAST_SUFFIX=$(echo "$EXISTING" | sed "s/^${KSUVER}-r//" | sort -n | tail -n1)
+            NEW_TAG="${KSUVER}-r$((LAST_SUFFIX + 1))"
+          fi
+
+          echo "✅ Generated tag: $NEW_TAG"
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+          git tag "$NEW_TAG"
+          git push origin "$NEW_TAG"
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
