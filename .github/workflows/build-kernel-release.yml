@@ -3,7 +3,6 @@ name: Build and Release OnePlus Kernels
 permissions:
   contents: write
   actions: write
-  workflows: write
 
 on:
   workflow_dispatch:
@@ -13,47 +12,46 @@ on:
         required: true
         type: boolean
         default: true
-      build_sm8450:
-        description: 'Build sm8450 (10Pro)?'
+      run_sm8450:
+        description: 'Run SM8450 build?'
         required: true
         type: boolean
         default: true
-      build_sm8475:
-        description: 'Build sm8475 (10t, 11r, Ace2)?'
+      run_sm8475:
+        description: 'Run SM8475 build?'
         required: true
         type: boolean
         default: true
-      build_sm8550:
-        description: 'Build sm8550 (11, Open, Ace2Pro)?'
+      run_sm8550:
+        description: 'Run SM8550 build?'
         required: true
         type: boolean
         default: true
-      build_sm8650:
-        description: 'Build sm8750 (12, 13r, Ace5)?'
+      run_sm8650:
+        description: 'Run SM8650 build?'
         required: true
         type: boolean
         default: true
-      build_sm8750:
-        description: 'Build sm8750 (13, Ace5Pro)?'
+      run_sm8750:
+        description: 'Run SM8750 build?'
         required: true
         type: boolean
         default: true
-      build_sm7675:
-        description: 'Build sm7675 (Nord4)?'
+      run_sm7675:
+        description: 'Run SM7675 build?'
         required: true
         type: boolean
         default: true
 
 jobs:
   build-sm8450:
-    if: ${{ inputs.build_sm8450 }}
+    if: ${{ inputs.run_sm8450 }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - model: OP10pro
             soc: waipio
-            branch: oneplus/sm8450
             manifest: oneplus_10_pro_v.xml
             android_version: android12
             kernel_version: "5.10"
@@ -62,66 +60,60 @@ jobs:
     with:
       model: ${{ matrix.model }}
       soc: ${{ matrix.soc }}
-      branch: ${{ matrix.branch }}
+      branch: oneplus/sm8450
       manifest: ${{ matrix.manifest }}
       android_version: ${{ matrix.android_version }}
       kernel_version: ${{ matrix.kernel_version }}
-      
+
   build-sm8475:
-    if: ${{ inputs.build_sm8475 }}
+    if: ${{ inputs.run_sm8475 }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - model: OP10t
-            soc: waipio
-            branch: oneplus/sm8475
-            manifest: oneplus_10t_v.xml
-            android_version: android12
-            kernel_version: "5.10"
           - model: OP11r
             soc: waipio
-            branch: oneplus/sm8475
             manifest: oneplus_11r_v.xml
             android_version: android13
             kernel_version: "5.10"
-          - model: OPACE2
+          - model: OP-ACE-2
             soc: waipio
-            branch: oneplus/sm8475
             manifest: oneplus_ace2_v.xml
             android_version: android13
+            kernel_version: "5.10"
+          - model: OP10t
+            soc: waipio
+            manifest: oneplus_10t_v.xml
+            android_version: android12
             kernel_version: "5.10"
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
       model: ${{ matrix.model }}
       soc: ${{ matrix.soc }}
-      branch: ${{ matrix.branch }}
+      branch: oneplus/sm8475
       manifest: ${{ matrix.manifest }}
       android_version: ${{ matrix.android_version }}
       kernel_version: ${{ matrix.kernel_version }}
-      
+
   build-sm8550:
-    if: ${{ inputs.build_sm8550 }}
+    if: ${{ inputs.run_sm8550 }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - model: OP11
             soc: kalama
-            branch: oneplus/sm8550
             manifest: oneplus_11_v.xml
             android_version: android13
             kernel_version: "5.15"
-          - model: OPOPEN
+          - model: OP-OPEN
             soc: kalama
-            branch: oneplus/sm8550
             manifest: oneplus_open_v.xml
             android_version: android13
             kernel_version: "5.15"
-          - model: OPACE2PRO
+          - model: OP-ACE-2-PRO
             soc: kalama
-            branch: oneplus/sm8550
             manifest: oneplus_ace2pro_v.xml
             android_version: android13
             kernel_version: "5.15"
@@ -130,32 +122,29 @@ jobs:
     with:
       model: ${{ matrix.model }}
       soc: ${{ matrix.soc }}
-      branch: ${{ matrix.branch }}
+      branch: oneplus/sm8550
       manifest: ${{ matrix.manifest }}
       android_version: ${{ matrix.android_version }}
       kernel_version: ${{ matrix.kernel_version }}
-      
+
   build-sm8650:
-    if: ${{ inputs.build_sm8650 }}
+    if: ${{ inputs.run_sm8650 }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - model: OP12
             soc: pineapple
-            branch: oneplus/sm8650
             manifest: oneplus12_v.xml
             android_version: android14
             kernel_version: "6.1"
           - model: OP13r
             soc: pineapple
-            branch: oneplus/sm8650
             manifest: oneplus_13r.xml
             android_version: android14
             kernel_version: "6.1"
-          - model: OPACE5
+          - model: OP-ACE-5
             soc: pineapple
-            branch: oneplus/sm8650
             manifest: oneplus_ace5.xml
             android_version: android14
             kernel_version: "6.1"
@@ -164,26 +153,24 @@ jobs:
     with:
       model: ${{ matrix.model }}
       soc: ${{ matrix.soc }}
-      branch: ${{ matrix.branch }}
+      branch: oneplus/sm8650
       manifest: ${{ matrix.manifest }}
       android_version: ${{ matrix.android_version }}
       kernel_version: ${{ matrix.kernel_version }}
 
   build-sm8750:
-    if: ${{ inputs.build_sm8750 }}
+    if: ${{ inputs.run_sm8750 }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - model: OP13
             soc: sun
-            branch: oneplus/sm8750
             manifest: JiuGeFaCai_oneplus_13_v.xml
             android_version: android15
             kernel_version: "6.6"
           - model: OPAce5Pro
             soc: sun
-            branch: oneplus/sm8750
             manifest: JiuGeFaCai_oneplus_ace5_pro_v.xml
             android_version: android15
             kernel_version: "6.6"
@@ -192,20 +179,19 @@ jobs:
     with:
       model: ${{ matrix.model }}
       soc: ${{ matrix.soc }}
-      branch: ${{ matrix.branch }}
+      branch: oneplus/sm8750
       manifest: ${{ matrix.manifest }}
       android_version: ${{ matrix.android_version }}
       kernel_version: ${{ matrix.kernel_version }}
-      
+
   build-sm7675:
-    if: ${{ inputs.build_sm7675 }}
+    if: ${{ inputs.run_sm7675 }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - model: OPNORD4
+          - model: OP-NORD-4
             soc: pineapple
-            branch: oneplus/sm7675
             manifest: oneplus_nord_4_v.xml
             android_version: android14
             kernel_version: "6.1"
@@ -214,7 +200,7 @@ jobs:
     with:
       model: ${{ matrix.model }}
       soc: ${{ matrix.soc }}
-      branch: ${{ matrix.branch }}
+      branch: oneplus/sm7675
       manifest: ${{ matrix.manifest }}
       android_version: ${{ matrix.android_version }}
       kernel_version: ${{ matrix.kernel_version }}
@@ -227,73 +213,50 @@ jobs:
       - build-sm8650
       - build-sm8750
       - build-sm7675
+
     runs-on: ubuntu-latest
     if: ${{ inputs.make_release }}
     env:
-      REPO_OWNER: luigimak
-      REPO_NAME: OP_KSUNext_SUSFS
+      REPO_OWNER: TheWildJames
+      REPO_NAME: OnePlus_KernelSU_SUSFS
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASE_NAME: "*TEST BUILD* OnePlus Kernels with KernelSU Next & SUSFS *TEST BUILD*"
-#      RELEASE_NOTES: |
-      
-#        Module SUSFS: 
-#        -> https://github.com/sidex15/ksu_module_susfs
+      RELEASE_NAME: "*TEST BUILD* OnePlus Kernels With KernelSU Next & SUSFS v1.5.5 *TEST BUILD*"
+      RELEASE_NOTES: |
+        This release contains KernelSU Next and SUSFS v1.5.5
 
-#        KernelSU-Next Managers:
-#        -> https://github.com/KernelSU-Next/KernelSU-Next
+        Module: 
+        -> https://github.com/sidex15/ksu_module_susfs
 
-#        Features:
-#        [+] KernelSU-Next
-#        [+] SUSFS v1.5.5
-#        [+] Wireguard Support
-#        [+] Maphide LineageOS Detections
-#        [+] Futile Maphide for jit-zygote-cache Detections
-#        [+] Magic Mount Support
+        Non-Official Managers:
+        -> https://github.com/KernelSU-Next/KernelSU-Next
+
+        Features:
+        [+] KernelSU-Next
+        [+] SUSFS v1.5.5
+        [+] Wireguard Support
+        [+] Maphide LineageOS Detections
+        [+] Futile Maphide for jit-zygote-cache Detections
+        [+] Magic Mount Support
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Download KernelSU Version
-        uses: actions/download-artifact@v4
-        with:
-          name: kernelsu-version
-          path: ./ksu
-
-      - name: Read KernelSU Version
-        run: |
-          KSUVER=$(cat ./ksu/ksuver.txt)
-          echo "KSUVER=$KSUVER"
-          echo "KSUVER=$KSUVER" >> $GITHUB_ENV
-
-      - name: Set dynamic RELEASE_NOTES
-        run: |
-          echo "RELEASE_NOTES=Module SUSFS:%0A-> https://github.com/sidex15/ksu_module_susfs%0A" >> $GITHUB_ENV
-          echo "RELEASE_NOTES+=%0AKernelSU-Next Managers:%0A-> https://github.com/KernelSU-Next/KernelSU-Next%0A" >> $GITHUB_ENV
-          echo "RELEASE_NOTES+=%0AFeatures:%0A[+] KernelSU-Next v${KSUVER}%0A[+] SUSFS v1.5.5%0A[+] Wireguard Support%0A[+] Maphide LineageOS Detections%0A[+] Futile Maphide for jit-zygote-cache Detections%0A[+] Magic Mount Support" >> $GITHUB_ENV
-
-
       - name: Generate and Create New Tag
         run: |
-          KSUVER="${{ env.KSUVER }}"
-
-          EXISTING=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[].name' | grep "^$KSUVER" || true)
-
-          if [ -z "$EXISTING" ]; then
-            NEW_TAG="${KSUVER}-r0"
-          else
-            LAST_SUFFIX=$(echo "$EXISTING" | sed "s/^${KSUVER}-r//" | sort -n | tail -n1)
-            NEW_TAG="${KSUVER}-r$((LAST_SUFFIX + 1))"
-          fi
-
-          echo "✅ Generated tag: $NEW_TAG"
-          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
-          
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}.git
-          git tag "$NEW_TAG"
-          git push origin "$NEW_TAG"
+            BASE_VERSION="1.0.0"
+            TAGS=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[].name' | grep "^${BASE_VERSION}-r" || true)
+            if [ -z "$TAGS" ]; then
+              REVISION=0
+            else
+              REVISION=$(echo "$TAGS" | sed -E "s/^${BASE_VERSION}-r([0-9]+)/\1/" | sort -nr | head -n1)
+              REVISION=$((REVISION + 1))
+            fi
+            NEW_TAG="${BASE_VERSION}-r${REVISION}"
+            echo "New tag: $NEW_TAG"
+            echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
+            git tag "$NEW_TAG"
+            git push origin "$NEW_TAG"
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
@@ -308,7 +271,7 @@ jobs:
           release_name: ${{ env.RELEASE_NAME }}
           body: ${{ env.RELEASE_NOTES }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Release Assets Dynamically
         run: |
@@ -319,7 +282,7 @@ jobs:
               echo "Uploading $file..."
               gh release upload ${{ env.NEW_TAG }} "$file"
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NEW_TAG: ${{ env.NEW_TAG }}
 
       - name: Display Files Uploaded
