@@ -33,6 +33,10 @@ jobs:
       ACTIONS_STEP_DEBUG: true
       
     steps:
+      - name: Clean up work directory
+        run: |
+          rm -rf $RUNNER_WORK_DIRECTORY/*
+
 #      - name: Setup System
 #        run: |
 #          export DEBIAN_FRONTEND=noninteractive
