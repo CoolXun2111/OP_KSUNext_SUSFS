@@ -41,7 +41,7 @@ jobs:
       - name: Clean up work directory
         run: |
           echo "Work directory: $(pwd)"
-          sleep 60
+          sleep 5
           rm -rf *
 
       - name: Install Repo and Python
