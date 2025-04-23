@@ -160,6 +160,11 @@ jobs:
         [+] Magic Mount Support
 
     steps:
+      - name: Debug on
+        run: |
+          set -x
+          echo "commands with active debugs"
+
       - name: Checkout code
         uses: actions/checkout@v3
 
