@@ -33,9 +33,14 @@ jobs:
       ACTIONS_STEP_DEBUG: true
       
     steps:
+      - name: Debug on
+        run: |
+          set -x
+          echo "commands with active debugs"
+
       - name: Clean up work directory
         run: |
-          echo "cartella attuale: $(pwd)"
+          echo "Work directory: $(pwd)"
           sleep 60
           rm -rf *
 
