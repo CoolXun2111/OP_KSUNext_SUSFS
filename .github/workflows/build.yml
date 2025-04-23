@@ -2,7 +2,7 @@ name: Build
 permissions:
   contents: write  # Allow writing to repository contents (for pushing tags)
   actions: write   # Allows triggering actions
-  
+
 on:
   workflow_call: # This allows this workflow to be called from another workflow
     inputs:
@@ -127,11 +127,6 @@ jobs:
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
           sed -i "s/DKSU_VERSION=11998/DKSU_VERSION=${KSU_VERSION}/" Makefile
 
-      - name: Save KernelSU Version
-        run: |
-          echo "${KSU_VERSION}" > $GITHUB_WORKSPACE/ksuver.txt
-
-
       - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
@@ -162,8 +157,8 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG/kernel_platform/common"
           # Apply additional patch
-          cp ../../../kernel_patches/next/next_hooks.patch ./
-          patch -p1 --fuzz=3 < ./next_hooks.patch
+          cp ../../../kernel_patches/next/syscall_hooks.patch ./
+          patch -p1 --fuzz=3 < ./syscall_hooks.patch
           
       - name: Apply Hide Stuff Patches
         run: |
@@ -285,6 +280,12 @@ jobs:
 
           echo "Copying Image"
           cp ./out/dist/Image ../AnyKernel3/Image
+          if [ "${{ inputs.model }}" == "OPAce5Pro" ]; then
+            cp ./out/dist/dtbo.img ../AnyKernel3/
+            cp ./out/dist/system_dlkm.erofs.img ../AnyKernel3/system_dlkm.img
+            # cp ./out/dist/vendor_dlkm.img ../AnyKernel3/
+            # cp ./out/dist/vendor_boot.img ../AnyKernel3/
+          fi
 
       - name: Create ZIP Files for Different Formats
         run: |
@@ -292,17 +293,15 @@ jobs:
           cd ./AnyKernel3
 
           # Zip the files in the AnyKernel3 directory with a new naming convention
-          ZIP_NAME="${{ inputs.model }}_${{ inputs.android_version }}_${{ inputs.kernel_version }}_KSUNext_${KSUVER}_SUSFS_AnyKernel3.zip"
+          ZIP_NAME="${{ inputs.model }}_${{ inputs.android_version }}_${{ inputs.kernel_version }}_Next_SUSFS_AnyKernel3.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
+          # Fengchi Patch for OPAce5Pro
+          if [ "${{ inputs.model }}" == "OPAce5Pro" ]; then
+            sed -i 's/hmbird/xxbird/g' dtbo.img
+            zip -r "../$ZIP_NAME-CN-version.zip" ./*
+          fi
 
-      - name: Upload KernelSU Version
-        uses: actions/upload-artifact@v4
-        with:
-          name: kernelsu-version
-          path: ksuver.txt
-
-          
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
