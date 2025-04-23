@@ -69,8 +69,8 @@ jobs:
       - name: Install Repo and Python
         run: |
           # Install dependencies
-          sudo apt update
-          sudo apt install -y python3 python-is-python3
+#          sudo apt update
+#          sudo apt install -y python3 python-is-python3
           
           mkdir -p ./git-repo
           curl -sSL https://storage.googleapis.com/git-repo-downloads/repo > ./git-repo/repo
