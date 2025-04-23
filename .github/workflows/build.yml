@@ -28,7 +28,10 @@ on:
 jobs:
   build-kernel-oneplus-kernelsu-susfs:
     runs-on: [self-hosted, ubuntu-24.04]
-
+    env:
+      ACTIONS_RUNNER_DEBUG: true
+      ACTIONS_STEP_DEBUG: true
+      
     steps:
       - name: Setup System
         run: |
