@@ -35,7 +35,9 @@ jobs:
     steps:
       - name: Clean up work directory
         run: |
-          rm -rf $RUNNER_WORK_DIRECTORY/*
+          echo "cartella attuale: $(pwd)"
+          sleep 60
+          rm -rf *
 
       - name: Install Repo and Python
         run: |
