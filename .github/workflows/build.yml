@@ -36,7 +36,7 @@ jobs:
       - name: Clean up work directory
         run: |
           echo "Work directory: $(pwd)"
-          rm -rf *
+          sudo rm -rf * || true
           
       - name: Install Python3
         run: |
