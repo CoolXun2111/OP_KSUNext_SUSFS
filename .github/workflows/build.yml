@@ -33,25 +33,33 @@ jobs:
       ACTIONS_STEP_DEBUG: true
       
     steps:
-      - name: Debug on
-        run: |
-          set -x
-          echo "commands with active debugs"
-
       - name: Clean up work directory
         run: |
           echo "Work directory: $(pwd)"
-          sleep 5
           rm -rf *
-
-      - name: Install Repo and Python
-        run: |
-          # Install dependencies
           
-          mkdir -p ./git-repo
-          curl -sSL https://storage.googleapis.com/git-repo-downloads/repo > ./git-repo/repo
-          chmod a+rx ./git-repo/repo
-          echo "REPO=$GITHUB_WORKSPACE/./git-repo/repo" >> $GITHUB_ENV
+      - name: Install Python3
+        run: |
+          if ! command -v python3 &> /dev/null; then
+            echo "Python3 not found, updating apt and installing..."
+            sudo apt update
+            sudo apt install -y python3 python-is-python3
+          else
+            echo "Python3 is already installed at $(which python3)"
+          fi
+
+      - name: Install Repo
+        run: |
+          if ! command -v repo &> /dev/null; then
+            echo "Repo not found, installing..."
+            mkdir -p ./git-repo
+            curl -sSL https://storage.googleapis.com/git-repo-downloads/repo > ./git-repo/repo
+            chmod a+rx ./git-repo/repo
+            echo "REPO=$GITHUB_WORKSPACE/./git-repo/repo" >> $GITHUB_ENV
+          else
+            echo "Using installed Repo at $(which repo)"
+            echo "REPO=$(which repo)" >> $GITHUB_ENV
+          fi
 
       - name: Set CONFIG Environment Variable
         run: |
@@ -224,7 +232,7 @@ jobs:
           rm ./kernel_platform/msm-kernel/android/abi_gki_protected_exports_* || echo "No protected exports!"
           
           BUILD_TYPE="gki"
-          BAZEL_ARGS=(--jobs=$(nproc --all) --lto=thin)
+          BAZEL_ARGS=(--jobs=$(nproc --all) --lto=thin --sandbox_debug --verbose_failures)
           if [ "${{ inputs.soc }}" == "sun" ]; then
             BUILD_TYPE="perf"
             BAZEL_ARGS+=(-g)
@@ -272,7 +280,7 @@ jobs:
           cd ./AnyKernel3
 
           # Zip the files in the AnyKernel3 directory with a new naming convention
-          ZIP_NAME="${{ inputs.model }}_${{ inputs.android_version }}_${{ inputs.kernel_version }}_Next-${{ env.KSUVER }}_SUSFS_AnyKernel3.zip"
+          ZIP_NAME="${{ inputs.model }}_${{ inputs.android_version }}_${{ inputs.kernel_version }}_KSUN-${{ env.KSUVER }}_SUSFS_AnyKernel3.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
           # Fengchi Patch for OPAce5Pro
