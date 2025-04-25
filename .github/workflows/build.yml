@@ -86,6 +86,12 @@ jobs:
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/kernel_patches.git
 
+      - name: Get SUSFS Version
+        run: |
+          SUSFS_VERSION=$(grep -oP 'SUSFS_VERSION\s+"[^"]+"' susfs4ksu/kernel_patches/include/linux/susfs.h | grep -oP '"\K[^"]+')
+          echo "SUSFSVER=$SUSFS_VERSION" >> $GITHUB_ENV
+          echo "Detected SUSFS version: $SUSFS_VERSION"
+
       - name: Initialize and Sync Kernel Source
         run: |
           echo "Creating folder for configuration: $CONFIG..."
@@ -274,13 +280,13 @@ jobs:
             # cp ./out/dist/vendor_boot.img ../AnyKernel3/
           fi
 
-      - name: Create ZIP Files for Different Formats
+      - name: Create AnyKernel3 ZIP File
         run: |
           echo "Navigating to AnyKernel3 directory..."
           cd ./AnyKernel3
 
           # Zip the files in the AnyKernel3 directory with a new naming convention
-          ZIP_NAME="${{ inputs.model }}_${{ inputs.android_version }}_${{ inputs.kernel_version }}_KSUN-${{ env.KSUVER }}_SUSFS_AnyKernel3.zip"
+          ZIP_NAME="${{ inputs.model }}_${{ inputs.android_version }}_${{ inputs.kernel_version }}_KSUN-${{ env.KSUVER }}_SUSFS-${{ env.SUSFSVER }}_AnyKernel3.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
           # Fengchi Patch for OPAce5Pro
