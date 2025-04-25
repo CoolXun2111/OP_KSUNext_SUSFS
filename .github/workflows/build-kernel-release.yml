@@ -119,6 +119,12 @@ jobs:
             manifest: oneplus_nord_4_v.xml
             android_version: android14
             kernel_version: "6.1"
+          - model: OPNORDCE4
+            soc: crow
+            branch: oneplus/sm7550
+            manifest: oneplus_nord_ce4_v.xml
+            android_version: android14
+            kernel_version: "5.15"
 #          - model: OP-PAD-2
 #            soc: pineapple
 #            branch: oneplus/sm8650
