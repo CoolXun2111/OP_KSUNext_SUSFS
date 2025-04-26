@@ -38,7 +38,7 @@ jobs:
           export DEBIAN_FRONTEND=noninteractive
           echo "DEBIAN_FRONTEND=noninteractive" >> $GITHUB_ENV
           echo "Work directory: $(pwd)"
-          sudo rm -rf OP* || true
+          sudo rm -rf * || true
           
       - name: Install Python3
         run: |
