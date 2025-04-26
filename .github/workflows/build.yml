@@ -33,10 +33,12 @@ jobs:
       ACTIONS_STEP_DEBUG: true
       
     steps:
-      - name: Clean up work directory
+      - name: Setup System
         run: |
+          export DEBIAN_FRONTEND=noninteractive
+          echo "DEBIAN_FRONTEND=noninteractive" >> $GITHUB_ENV
           echo "Work directory: $(pwd)"
-          sudo rm -rf * || true
+          sudo rm -rf OP* || true
           
       - name: Install Python3
         run: |
@@ -88,7 +90,8 @@ jobs:
 
       - name: Get SUSFS Version
         run: |
-          SUSFS_VERSION=$(grep -oP 'SUSFS_VERSION\s+"[^"]+"' susfs4ksu/kernel_patches/include/linux/susfs.h | grep -oP '"\K[^"]+')
+          RAW_VERSION=$(grep -oP 'SUSFS_VERSION\s+"[^"]+"' susfs4ksu/kernel_patches/include/linux/susfs.h | grep -oP '"\K[^"]+')
+          SUSFS_VERSION=${RAW_VERSION#v}
           echo "SUSFSVER=$SUSFS_VERSION" >> $GITHUB_ENV
           echo "Detected SUSFS version: $SUSFS_VERSION"
 
