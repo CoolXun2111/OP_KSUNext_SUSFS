@@ -1,4 +1,4 @@
-name: Build OnePlus 13 Kernels
+name: Build OnePlus 10 Pro Kernels
 
 permissions:
   contents: write
@@ -153,9 +153,9 @@ jobs:
       REPO_OWNER: ${{ github.repository_owner }}
       REPO_NAME: ${{ github.event.repository.name }}
       GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      RELEASE_NAME: "OnePlus 13 Kernels With KernelSU Next & SUSFS"
+      RELEASE_NAME: "OnePlus 10 Pro Kernels With KernelSU-Next & SUSFS"
       RELEASE_NOTES: |
-        This release contains KernelSU Next and SUSFS
+        This release contains KernelSU-Next and SUSFS
 
         Module: 
         -> https://github.com/sidex15/ksu_module_susfs
