@@ -1,0 +1,62 @@
+name: TEST Create and Publish Release
+
+permissions:
+  contents: write
+  actions: write
+
+on:
+  workflow_dispatch:
+
+env:
+  REPO_OWNER: ${{ github.repository_owner }}
+  REPO_NAME: ${{ github.event.repository.name }}
+  GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+  RELEASE_NAME: "Test Fast Release"
+  RELEASE_NOTES: |
+    This is a test release to test tagging and publishing using PAT.
+
+jobs:
+  release-job:
+    runs-on: [self-hosted, ubuntu-24.04]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Generate and Create New Tag
+        run: |
+          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "test-r0")
+          echo "Latest tag: $LATEST_TAG"
+
+          if [[ "$LATEST_TAG" != test-* ]]; then
+            LATEST_TAG="test-r0"
+          fi
+
+          NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
+            echo "Tag $NEW_TAG already exists locally, skipping local creation."
+          else
+            git tag "$NEW_TAG"
+          fi
+
+          if git ls-remote --tags origin | grep "refs/tags/$NEW_TAG$"; then
+            echo "Tag $NEW_TAG already exists on remote, skipping push."
+          else
+            git push origin "$NEW_TAG"
+          fi
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ env.NEW_TAG }}
+          prerelease: true
+          release_name: ${{ env.RELEASE_NAME }}
+          body: ${{ env.RELEASE_NOTES }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
