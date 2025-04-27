@@ -40,6 +40,7 @@ jobs:
           echo "DEBIAN_FRONTEND=noninteractive" >> $GITHUB_ENV
           echo "Work directory: $(pwd)"
           sudo rm -rf * || true
+          sudo rm -rf .[^.]* || true
           
       - name: Install Python3
         run: |
