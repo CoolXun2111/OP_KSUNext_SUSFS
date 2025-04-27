@@ -161,7 +161,7 @@ jobs:
         Module: 
         -> https://github.com/sidex15/ksu_module_susfs
 
-        Non-Official Managers:
+        KernelSU-Next Managers:
         -> https://github.com/KernelSU-Next/KernelSU-Next
 
         Features:
@@ -173,16 +173,12 @@ jobs:
         [+] Magic Mount Support
 
     steps:
-      - name: Debug on
-        run: |
-          set -x
-          echo "commands with active debugs"
-
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Generate and Create New Tag
         run: |
+          set -x
           LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "op13-r0")
           echo "Latest tag: $LATEST_TAG"
 
@@ -220,6 +216,7 @@ jobs:
 
       - name: Upload Release Assets Dynamically
         run: |
+          set -x
           for file in ./downloaded-artifacts/kernel-*/*; do
               if [ -d "$file" ]; then
                   continue
@@ -233,5 +230,6 @@ jobs:
 
       - name: Display Files Uploaded
         run: |
+          set -x
           echo "GitHub release created with the following files:"
           ls ./downloaded-artifacts/**/*
