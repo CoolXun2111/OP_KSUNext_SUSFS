@@ -35,28 +35,50 @@ jobs:
       - name: Generate and Create New Tag
         run: |
           set -x
+
+          # Recupera l'ultimo tag
           LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "test-r0")
           echo "Latest tag: $LATEST_TAG"
 
+          # Se l'ultimo tag non è del tipo corretto, parte da test-r0
           if [[ "$LATEST_TAG" != test-* ]]; then
             LATEST_TAG="test-r0"
           fi
 
+          # Calcola il nuovo tag incrementale
           NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
+          
+          # Verifica che il tag sia unico
           while gh api repos/$REPO_OWNER/$REPO_NAME/git/refs/tags | grep -q "\"ref\": \"refs/tags/$NEW_TAG\""; do
             NEW_TAG=$(echo "$NEW_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
           done
+
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
           echo "Generated unique tag: $NEW_TAG"
 
+          # Configura git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Controlla se ci sono modifiche a workflow files
+          if git diff --name-only HEAD~1 HEAD | grep -q ".github/workflows/"; then
+            echo "⚠️ Workflow files modified, creating empty commit..."
+            git commit --allow-empty -m "Empty commit to avoid workflow permission issue"
+            git push
+          else
+            echo "✅ No workflow changes detected."
+          fi
+
+          # Crea e pusha il nuovo tag
           git tag "$NEW_TAG"
           git push origin "$NEW_TAG"
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Create GitHub Release with Retry
         run: |
+          set -x
           ATTEMPTS=0
           MAX_ATTEMPTS=3
           DELAY_SECONDS=10
