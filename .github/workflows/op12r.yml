@@ -177,15 +177,16 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          fetch-depth: 0
 
       - name: Generate and Create New Tag
         run: |
           set -x
-          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "op12r-r0")
+          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "op12-r0")
           echo "Latest tag: $LATEST_TAG"
 
-          if [[ "$LATEST_TAG" != op12r-* ]]; then
-            LATEST_TAG="op12r-r0"
+          if [[ "$LATEST_TAG" != op12-* ]]; then
+            LATEST_TAG="op12-r0"
           fi
 
           NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
@@ -198,8 +199,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # ⚠️ Se ci sono modifiche a workflow files, crea commit vuoto
-          if git diff --name-only HEAD~1 HEAD | grep -q ".github/workflows/"; then
+          if git status --porcelain | grep -qE '\.github/workflows/'; then
             echo "⚠️ Workflow files modified, creating empty commit..."
             git commit --allow-empty -m "Empty commit to avoid workflow permission issue"
             git push
@@ -207,6 +207,11 @@ jobs:
             echo "✅ No workflow changes detected."
           fi
 
+          if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
+            echo "⚠️ Local tag $NEW_TAG already exists, deleting it."
+            git tag -d "$NEW_TAG"
+          fi
+  
           git tag "$NEW_TAG"
           git push origin "$NEW_TAG"
         env:
