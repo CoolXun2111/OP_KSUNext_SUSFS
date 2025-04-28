@@ -6,19 +6,27 @@ permissions:
 
 on:
   workflow_dispatch:
-
-env:
-  REPO_OWNER: ${{ github.repository_owner }}
-  REPO_NAME: ${{ github.event.repository.name }}
-  GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-  RELEASE_NAME: "Test Fast Release"
-  RELEASE_NOTES: |
-    This is a test release to test tagging and publishing using PAT.
+    inputs:
+      make_release:
+        description: 'Do you want to create a release?'
+        required: true
+        type: boolean
+        default: true
 
 jobs:
-  release-job:
+  trigger-release:
     runs-on: [self-hosted, ubuntu-24.04]
+    if: ${{ inputs.make_release }}
+    env:
+      ACTIONS_RUNNER_DEBUG: true
+      ACTIONS_STEP_DEBUG: true
+      REPO_OWNER: ${{ github.repository_owner }}
+      REPO_NAME: ${{ github.event.repository.name }}
+      GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      RELEASE_NAME: "Test Fast Release"
+      RELEASE_NOTES: |
+        This is a test release to test tagging and publishing using PAT.
 
     steps:
       - name: Checkout Code
@@ -53,6 +61,7 @@ jobs:
 #
       - name: Generate and Create New Tag
         run: |
+          set -x
           LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "op10pro-r0")
           echo "Latest tag: $LATEST_TAG"
 
