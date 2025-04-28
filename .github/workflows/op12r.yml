@@ -182,11 +182,11 @@ jobs:
       - name: Generate and Create New Tag
         run: |
           set -x
-          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "op12-r0")
+          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "op12r-r0")
           echo "Latest tag: $LATEST_TAG"
 
-          if [[ "$LATEST_TAG" != op12-* ]]; then
-            LATEST_TAG="op12-r0"
+          if [[ "$LATEST_TAG" != op12r-* ]]; then
+            LATEST_TAG="op12r-r0"
           fi
 
           NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
