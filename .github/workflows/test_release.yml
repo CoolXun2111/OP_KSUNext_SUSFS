@@ -29,8 +29,10 @@ jobs:
         This is a test release to test tagging and publishing using PAT.
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Generate and Create New Tag
         run: |
