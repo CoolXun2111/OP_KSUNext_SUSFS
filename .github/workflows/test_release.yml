@@ -32,45 +32,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-#      - name: Generate and Create New Tag
-#        run: |
-#          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "test-r0")
-#          echo "Latest tag: $LATEST_TAG"
-#
-#          if [[ "$LATEST_TAG" != test-* ]]; then
-#            LATEST_TAG="test-r0"
-#          fi
-#
-#          NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
-#          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
-#
-#          git config user.name "github-actions[bot]"
-#          git config user.email "github-actions[bot]@users.noreply.github.com"
-#
-#          if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
-#            echo "Tag $NEW_TAG already exists locally, skipping local creation."
-#          else
-#            git tag "$NEW_TAG"
-#          fi
-#
-#          if git ls-remote --tags origin | grep "refs/tags/$NEW_TAG$"; then
-#            echo "Tag $NEW_TAG already exists on remote, skipping push."
-#          else
-#            git push origin "$NEW_TAG"
-#          fi
-#
       - name: Generate and Create New Tag
         run: |
           set -x
-          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "op10pro-r0")
+          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "test-r0")
           echo "Latest tag: $LATEST_TAG"
 
-          if [[ "$LATEST_TAG" != op10pro-* ]]; then
-            LATEST_TAG="op10pro-r0"
+          if [[ "$LATEST_TAG" != test-* ]]; then
+            LATEST_TAG="test-r0"
           fi
 
           NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
-          while git ls-remote --tags origin | grep -q "refs/tags/$NEW_TAG$"; do
+          while gh api repos/$REPO_OWNER/$REPO_NAME/git/refs/tags | grep -q "\"ref\": \"refs/tags/$NEW_TAG\""; do
             NEW_TAG=$(echo "$NEW_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
           done
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
@@ -82,12 +55,36 @@ jobs:
           git tag "$NEW_TAG"
           git push origin "$NEW_TAG"
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.NEW_TAG }}
-          prerelease: true
-          name: ${{ env.RELEASE_NAME }}
-          body: ${{ env.RELEASE_NOTES }}
+      - name: Create GitHub Release with Retry
+        run: |
+          ATTEMPTS=0
+          MAX_ATTEMPTS=3
+          DELAY_SECONDS=10
+
+          while true; do
+            set +e
+            echo "Attempt $((ATTEMPTS+1)) to create GitHub Release..."
+            gh release create "${{ env.NEW_TAG }}" --title "${{ env.RELEASE_NAME }}" --notes "${{ env.RELEASE_NOTES }}" --prerelease
+            EXIT_CODE=$?
+            set -e
+
+            if [ $EXIT_CODE -eq 0 ]; then
+              echo "✅ GitHub Release created successfully!"
+              break
+            fi
+
+            ATTEMPTS=$((ATTEMPTS+1))
+            if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then
+              echo "❌ Failed to create GitHub Release after $MAX_ATTEMPTS attempts."
+              exit 1
+            fi
+
+            echo "⚠️ GitHub Release creation failed (attempt $ATTEMPTS). Retrying in $DELAY_SECONDS seconds..."
+            sleep $DELAY_SECONDS
+          done
         env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          RELEASE_NAME: ${{ env.RELEASE_NAME }}
+          RELEASE_NOTES: ${{ env.RELEASE_NOTES }}
+          NEW_TAG: ${{ env.NEW_TAG }}
