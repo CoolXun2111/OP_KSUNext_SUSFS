@@ -175,6 +175,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Generate and Create New Tag
         run: |
@@ -187,7 +189,7 @@ jobs:
           fi
 
           NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
-          while git ls-remote --tags origin | grep -q "refs/tags/$NEW_TAG$"; do
+          while gh api repos/$REPO_OWNER/$REPO_NAME/git/refs/tags | grep -q "\"ref\": \"refs/tags/$NEW_TAG\""; do
             NEW_TAG=$(echo "$NEW_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
           done
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
@@ -196,23 +198,60 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # ⚠️ Se ci sono modifiche a workflow files, crea commit vuoto
+          if git diff --name-only HEAD~1 HEAD | grep -q ".github/workflows/"; then
+            echo "⚠️ Workflow files modified, creating empty commit..."
+            git commit --allow-empty -m "Empty commit to avoid workflow permission issue"
+            git push
+          else
+            echo "✅ No workflow changes detected."
+          fi
+
           git tag "$NEW_TAG"
           git push origin "$NEW_TAG"
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
           path: ./downloaded-artifacts
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.NEW_TAG }}
-          prerelease: true
-          name: ${{ env.RELEASE_NAME }}
-          body: ${{ env.RELEASE_NOTES }}
+      - name: Create GitHub Release with Retry
+        run: |
+          set -x
+          ATTEMPTS=0
+          MAX_ATTEMPTS=3
+          DELAY_SECONDS=10
+
+          while true; do
+            set +e
+            echo "Attempt $((ATTEMPTS+1)) to create GitHub Release..."
+            gh release create "${{ env.NEW_TAG }}" --title "${{ env.RELEASE_NAME }}" --notes "${{ env.RELEASE_NOTES }}" --prerelease
+            EXIT_CODE=$?
+            set -e
+
+            if [ $EXIT_CODE -eq 0 ]; then
+              echo "✅ GitHub Release created successfully!"
+              break
+            fi
+
+            ATTEMPTS=$((ATTEMPTS+1))
+            if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then
+              echo "❌ Failed to create GitHub Release after $MAX_ATTEMPTS attempts."
+              exit 1
+            fi
+
+            echo "⚠️ GitHub Release creation failed (attempt $ATTEMPTS). Retrying in $DELAY_SECONDS seconds..."
+            sleep $DELAY_SECONDS
+          done
         env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          RELEASE_NAME: ${{ env.RELEASE_NAME }}
+          RELEASE_NOTES: ${{ env.RELEASE_NOTES }}
+          NEW_TAG: ${{ env.NEW_TAG }}
 
       - name: Upload Release Assets Dynamically
         run: |
@@ -225,7 +264,7 @@ jobs:
               gh release upload ${{ env.NEW_TAG }} "$file"
           done
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           NEW_TAG: ${{ env.NEW_TAG }}
 
       - name: Display Files Uploaded
