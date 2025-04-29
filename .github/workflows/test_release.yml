@@ -35,47 +35,89 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           fetch-depth: 0  # 🔥 Recupera tutta la storia git per sicurezza
 
+#      - name: Generate and Create New Tag
+#        run: |
+#          set -x
+#
+#          # Recupera l'ultimo tag
+#          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "test-r0")
+#          echo "Latest tag: $LATEST_TAG"
+#
+#          # Se l'ultimo tag non è del tipo corretto, parte da test-r0
+#          if [[ "$LATEST_TAG" != test-* ]]; then
+#            LATEST_TAG="test-r0"
+#          fi
+#
+#          # Calcola il nuovo tag incrementale
+#          NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
+#
+#          # Verifica che il tag sia unico su remoto
+#          while gh api repos/$REPO_OWNER/$REPO_NAME/git/refs/tags | grep -q "\"ref\": \"refs/tags/$NEW_TAG\""; do
+#            NEW_TAG=$(echo "$NEW_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
+#          done
+#
+#          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+#          echo "Generated unique tag: $NEW_TAG"
+#
+#          # Configura git
+#          git config user.name "github-actions[bot]"
+#          git config user.email "github-actions[bot]@users.noreply.github.com"
+#
+#          # 🔥 Controlla modifiche senza usare HEAD~1
+#          if git status --porcelain | grep -qE '\.github/workflows/'; then
+#            echo "⚠️ Workflow files modified, creating empty commit..."
+#            git commit --allow-empty -m "Empty commit to avoid workflow permission issue"
+#            git push
+#          else
+#            echo "✅ No workflow changes detected."
+#          fi
+#
+#          # 🔥 Se il tag esiste già localmente, lo cancella
+#          if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
+#            echo "⚠️ Local tag $NEW_TAG already exists, deleting it."
+#            git tag -d "$NEW_TAG"
+#          fi
+#
+#          # Crea e pusha il nuovo tag
+#          git tag "$NEW_TAG"
+#          git push origin "$NEW_TAG"
+#        env:
+#          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#
       - name: Generate and Create New Tag
         run: |
           set -x
 
-          # Recupera l'ultimo tag
-          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name' || echo "test-r0")
-          echo "Latest tag: $LATEST_TAG"
+          # Filtra tutti i tag che iniziano con "test-r" e prende il maggiore
+          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags \
+            --jq '[.[].name | select(startswith("test-r"))] | map(split("-r")[1] | tonumber) | max' \
+            || echo "0")
+    
+          echo "Latest numeric suffix for test-r*: $LATEST_TAG"
 
-          # Se l'ultimo tag non è del tipo corretto, parte da test-r0
-          if [[ "$LATEST_TAG" != test-* ]]; then
-            LATEST_TAG="test-r0"
-          fi
+          NEXT_NUM=$((LATEST_TAG + 1))
+          NEW_TAG="test-r$NEXT_NUM"
 
-          # Calcola il nuovo tag incrementale
-          NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
-          
-          # Verifica che il tag sia unico su remoto
+          # Verifica che il nuovo tag non esista su remoto
           while gh api repos/$REPO_OWNER/$REPO_NAME/git/refs/tags | grep -q "\"ref\": \"refs/tags/$NEW_TAG\""; do
-            NEW_TAG=$(echo "$NEW_TAG" | awk -F'-r' '{v=$2+1; print $1"-r"v}')
+            NEXT_NUM=$((NEXT_NUM + 1))
+            NEW_TAG="test-r$NEXT_NUM"
           done
 
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
           echo "Generated unique tag: $NEW_TAG"
 
-          # Configura git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # 🔥 Controlla modifiche senza usare HEAD~1
+          # Verifica se sono stati modificati file di workflow
           if git status --porcelain | grep -qE '\.github/workflows/'; then
             echo "⚠️ Workflow files modified, creating empty commit..."
             git commit --allow-empty -m "Empty commit to avoid workflow permission issue"
             git push
           else
             echo "✅ No workflow changes detected."
-          fi
-
-          # 🔥 Se il tag esiste già localmente, lo cancella
-          if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
-            echo "⚠️ Local tag $NEW_TAG already exists, deleting it."
-            git tag -d "$NEW_TAG"
           fi
 
           # Crea e pusha il nuovo tag
