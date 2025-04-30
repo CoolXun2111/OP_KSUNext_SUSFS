@@ -154,7 +154,7 @@ jobs:
       REPO_NAME: ${{ github.event.repository.name }}
       GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      RELEASE_NAME: "OnePlus 13 Kernels With KernelSU-Next & SUSFS"
+      RELEASE_NAME: "OnePlus 13 Kernel With KernelSU-Next & SUSFS"
       RELEASE_NOTES: |
         This release contains KernelSU-Next and SUSFS
 
@@ -165,12 +165,14 @@ jobs:
         -> https://github.com/KernelSU-Next/KernelSU-Next
 
         Features:
-        [+] KernelSU-Next
-        [+] SUSFS v1.5.7
+        [+] KernelSU-Next ☯
+        [+] SUSFS ඞ v1.5.7
+        [+] Manual Syscall Hooks for Better Hiding
         [+] Wireguard Support
-        [+] Maphide LineageOS Detections
+        [+] Simple Maphide LineageOS Detections
         [+] Futile Maphide for jit-zygote-cache Detections
         [+] Magic Mount Support
+        [+] BBR Support
 
     steps:
       - name: Checkout code
