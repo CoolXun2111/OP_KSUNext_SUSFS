@@ -11,6 +11,9 @@ this is a personal fork, all work goes to "Credits"
 >By flashing this kernel, **YOU** are choosing to make these modifications. If something goes wrong, **DO NOT** blame me!
 > ##  Proceed at your own risk!
 
+## Kernel Flasher recommended
+https://github.com/fatalcoder524/KernelFlasher
+
 ## 🚀 Credits
 
 - [@fatalcoder524](https://github.com/fatalcoder524/OnePlus_KernelSU_SUSFS), [@TheWildJames](https://github.com/WildPlusKernel/OnePlus_KernelSU_SUSFS) and [@FerGus786](https://github.com/WildPlusKernel/OnePlus_KernelSU_SUSFS) : Original projects. 🙏
