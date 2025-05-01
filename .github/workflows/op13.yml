@@ -15,7 +15,6 @@ on:
 
 jobs:
   build-batch:
-    # needs: build-batch-1
     strategy:
       fail-fast: false
       matrix:
@@ -79,16 +78,16 @@ jobs:
         run: |
           set -x
           LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags \
-            --jq '[.[].name | select(startswith("op13-r"))] | map(split("-r")[1] | tonumber) | max' \
+            --jq '[.[].name | select(startswith("op13-n"))] | map(split("-n")[1] | tonumber) | max' \
             || echo "0")
 
-          echo "Latest numeric suffix for op13-r*: $LATEST_TAG"
+          echo "Latest numeric suffix for op13-n*: $LATEST_TAG"
           NEXT_NUM=$((LATEST_TAG + 1))
-          NEW_TAG="op13-r$NEXT_NUM"
+          NEW_TAG="op13-n$NEXT_NUM"
 
           while gh api repos/$REPO_OWNER/$REPO_NAME/git/refs/tags | grep -q "\"ref\": \"refs/tags/$NEW_TAG\""; do
             NEXT_NUM=$((NEXT_NUM + 1))
-            NEW_TAG="op13-r$NEXT_NUM"
+            NEW_TAG="op13-n$NEXT_NUM"
           done
 
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
