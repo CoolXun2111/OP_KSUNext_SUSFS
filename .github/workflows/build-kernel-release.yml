@@ -232,7 +232,7 @@ jobs:
           while true; do
             set +e
             echo "Attempt $((ATTEMPTS+1)) to create GitHub Release..."
-            gh release create "${{ env.NEW_TAG }}" --title "${{ env.RELEASE_NAME }}" --notes "${{ env.RELEASE_NOTES }}" # --prerelease
+            gh release create "${{ env.NEW_TAG }}" --title "${{ env.RELEASE_NAME }}" --notes "${{ env.RELEASE_NOTES }}"
             EXIT_CODE=$?
             set -e
 
