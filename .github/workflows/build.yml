@@ -187,7 +187,7 @@ jobs:
         run: |
           cd "$CONFIG/kernel_platform/KernelSU-Next"
           echo "Applying Manager patch for KernelSU Next..."
-          cp ../../kernel_patches/next/manager.patch ./
+          cp ../../../kernel_patches/next/manager.patch ./
           patch -p1 --fuzz=3 < manager.patch || true
 
       - name: Add SUSFS Configuration Settings
