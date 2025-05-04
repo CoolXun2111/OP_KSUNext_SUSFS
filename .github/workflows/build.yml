@@ -165,14 +165,14 @@ jobs:
           fi
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
-      - name: Apply KSU Hooks
+      - name: Apply KernelSU-Next Hooks
         run: |
           set -x
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG/kernel_platform/common"
           # Apply additional patch
           cp ../../../kernel_patches/next/syscall_hooks.patch ./
-          patch -p1 --fuzz=3 < ./syscall_hooks.patch
+          patch -p1 --fuzz=3 < ./syscall_hooks.patch || true
           
       - name: Apply Hide Stuff Patches
         run: |
@@ -181,7 +181,14 @@ jobs:
           cd "$CONFIG/kernel_platform/common"
           # Apply additional patch
           cp ../../../kernel_patches/69_hide_stuff.patch ./
-          patch -p1 -F 3 < 69_hide_stuff.patch
+          patch -p1 -F 3 < 69_hide_stuff.patch || true
+          
+      - name: Add Manager Patch
+        run: |
+          cd "$CONFIG/kernel_platform/KernelSU-Next"
+          echo "Applying Manager patch for KernelSU Next..."
+          cp ../../kernel_patches/next/manager.patch ./
+          patch -p1 --fuzz=3 < manager.patch || true
 
       - name: Add SUSFS Configuration Settings
         run: |
