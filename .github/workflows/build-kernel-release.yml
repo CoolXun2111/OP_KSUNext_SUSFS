@@ -159,20 +159,20 @@ jobs:
         This release contains KernelSU-Next and SUSFS
 
         Module: 
-        -> https://github.com/sidex15/ksu_module_susfs
+        ☯ https://github.com/sidex15/ksu_module_susfs
 
         KernelSU-Next Managers:
-        -> https://github.com/KernelSU-Next/KernelSU-Next
+        ඞ https://github.com/KernelSU-Next/KernelSU-Next
 
         Features:
-        [+] KernelSU-Next ☯
-        [+] SUSFS 1.5.7 ඞ
-        [+] Manual Syscall Hooks for Better Hiding
-        [+] Wireguard Support
-        [+] Simple Maphide LineageOS Detections
-        [+] Futile Maphide for jit-zygote-cache Detections
-        [+] Magic Mount Support
-        [+] BBR Support
+        🔹 KernelSU-Next 
+        🔹 SUSFS 1.5.7 
+        🔹 Manual Syscall Hooks for Better Hiding
+        🔹 Wireguard Support
+        🔹 Simple Maphide LineageOS Detections
+        🔹 Futile Maphide for jit-zygote-cache Detections
+        🔹 Magic Mount Support
+        🔹 BBR Support
 
     steps:
       - name: Checkout code
