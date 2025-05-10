@@ -1,4 +1,4 @@
-name: Build OnePlus 10T Kernels
+name: Build OnePlus 10T Kernel
 
 permissions:
   contents: write
@@ -52,20 +52,20 @@ jobs:
         This release contains KernelSU-Next and SUSFS
 
         Module: 
-        -> https://github.com/sidex15/ksu_module_susfs
+        ඞ https://github.com/sidex15/ksu_module_susfs
 
         KernelSU-Next Managers:
-        -> https://github.com/KernelSU-Next/KernelSU-Next
+        ☯ https://github.com/KernelSU-Next/KernelSU-Next
 
         Features:
-        [+] KernelSU-Next ☯
-        [+] SUSFS ඞ
-        [+] Manual Syscall Hooks for Better Hiding
-        [+] Wireguard Support
-        [+] Simple Maphide LineageOS Detections
-        [+] Futile Maphide for jit-zygote-cache Detections
-        [+] Magic Mount Support
-        [+] BBR Support
+        🔹 KernelSU-Next 
+        🔹 SUSFS 1.5.7 
+        🔹 Manual Syscall Hooks for Better Hiding
+        🔹 Wireguard Support
+        🔹 Simple Maphide LineageOS Detections
+        🔹 Futile Maphide for jit-zygote-cache Detections
+        🔹 Magic Mount Support
+        🔹 BBR Support
 
     steps:
       - name: Checkout code
@@ -77,17 +77,19 @@ jobs:
       - name: Generate and Create New Tag
         run: |
           set -x
-          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags \
-            --jq '[.[].name | select(startswith("op10t-n"))] | map(split("-n")[1] | tonumber) | max' \
+          TAG_PREFIX="${TAG_PREFIX%/}"
+          LATEST_NUM=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags \
+            --jq "[.[].name | select(test(\"^${TAG_PREFIX}[0-9]+$\")) | sub(\"${TAG_PREFIX}\"; \"\") | tonumber] | max" \
             || echo "0")
 
-          echo "Latest numeric suffix for op10t-n*: $LATEST_TAG"
-          NEXT_NUM=$((LATEST_TAG + 1))
-          NEW_TAG="op10t-n$NEXT_NUM"
+          echo "Latest numeric suffix for $TAG_PREFIX*: $LATEST_NUM"
+
+          NEXT_NUM=$((LATEST_NUM + 1))
+          NEW_TAG="${TAG_PREFIX}${NEXT_NUM}"
 
           while gh api repos/$REPO_OWNER/$REPO_NAME/git/refs/tags | grep -q "\"ref\": \"refs/tags/$NEW_TAG\""; do
             NEXT_NUM=$((NEXT_NUM + 1))
-            NEW_TAG="op10t-n$NEXT_NUM"
+            NEW_TAG="${TAG_PREFIX}${NEXT_NUM}"
           done
 
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
@@ -107,6 +109,7 @@ jobs:
           git tag "$NEW_TAG"
           git push origin "$NEW_TAG"
         env:
+          TAG_PREFIX: op10t-n
           GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
