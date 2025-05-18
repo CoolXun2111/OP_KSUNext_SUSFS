@@ -154,16 +154,21 @@ jobs:
           
           cd ./KernelSU-Next
           
-          echo "Applying next SUSFS patches..."
+          echo "Applying kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch..."
           cp ../../../kernel_patches/next/kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch ./
-          patch -p1 --forward < kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch || true
+          patch -p1 --forward --verbose < kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch || true
+          ls -l *.rej || true
+          cat *.rej || true
           
           # Change to common directory and apply SUSFS patch
           cd ../common
           if [ "${{ inputs.soc }}" == "sun" ]; then
             sed -i '/#include <trace\/hooks\/blk.h>/a #include <trace/hooks/fs.h>' ./fs/namespace.c
           fi
-          patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          echo "Applying 50_add_susfs_in_gki-.patch..."
+          patch -p1 --verbose < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          ls -l *.rej || true
+          cat *.rej || true
 
       - name: Apply KernelSU-Next Hooks
         run: |
@@ -171,24 +176,31 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG/kernel_platform/common"
           # Apply additional patch
+          echo "Applying syscall_hooks.patch..."
           cp ../../../kernel_patches/next/syscall_hooks.patch ./
-          patch -p1 --fuzz=3 < ./syscall_hooks.patch || true
+          patch -p1 --fuzz=3 --verbose < ./syscall_hooks.patch || true
+          ls -l *.rej || true
+          cat *.rej || true
           
       - name: Apply Hide Stuff Patches
         run: |
           set -x
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG/kernel_platform/common"
-          # Apply additional patch
+          echo "Applying 69_hide_stuff.patch..."
           cp ../../../kernel_patches/69_hide_stuff.patch ./
-          patch -p1 -F 3 < 69_hide_stuff.patch || true
+          patch -p1 --fuzz=3 --verbose < 69_hide_stuff.patch || true
+          ls -l *.rej || true
+          cat *.rej || true
           
       - name: Add Manager Patch
         run: |
           cd "$CONFIG/kernel_platform/KernelSU-Next"
-          echo "Applying Manager patch for KernelSU Next..."
+          echo "Applying manager.patch for KernelSU Next..."
           cp ../../../kernel_patches/next/manager.patch ./
-          patch -p1 --fuzz=3 < manager.patch || true
+          patch -p1 --fuzz=3 --verbose < manager.patch || true
+          ls -l *.rej || true
+          cat *.rej || true
 
       - name: Add SUSFS Configuration Settings
         run: |
