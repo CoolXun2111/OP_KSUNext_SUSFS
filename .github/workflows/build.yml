@@ -92,8 +92,8 @@ jobs:
           # Clone repositories using the branch names
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          git clone https://github.com/TheWildJames/kernel_patches.git
-          #git clone https://github.com/luigimak/kernel_patches.git
+          #git clone https://github.com/TheWildJames/kernel_patches.git
+          git clone https://github.com/luigimak/kernel_patches.git
 
       - name: Get SUSFS Version
         run: |
@@ -155,8 +155,8 @@ jobs:
           cd ./KernelSU-Next
           
           echo "Applying kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch..."
-          cp ../../../kernel_patches/next/kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch ./
-          patch -p1 --forward --verbose < kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch || true
+          cp ../../../kernel_patches/next/fix_kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch ./
+          patch -p1 --forward --verbose < fix_kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch || true
           ls -l *.rej || true
           cat *.rej || true
           
