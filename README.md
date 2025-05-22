@@ -19,6 +19,7 @@ https://github.com/fatalcoder524/KernelFlasher
 - [@fatalcoder524](https://github.com/fatalcoder524/OnePlus_KernelSU_SUSFS), [@TheWildJames](https://github.com/WildPlusKernel/OnePlus_KernelSU_SUSFS) and [@FerGus786](https://github.com/WildPlusKernel/OnePlus_KernelSU_SUSFS) : Original projects. 🙏
 - [@tiann](https://github.com/tiann/KernelSU) : KernelSU idea.
 - [@RifsxD](https://github.com/KernelSU-Next/KernelSU-Next) : KernelSU-Next idea.
+- [@WildKernels](https://github.com/WildKernels/Wild_KSU) : Wild_KSU idea.
 - [@simonpunk](https://gitlab.com/simonpunk/susfs4ksu.git) : SUSFS patches.
 - [@sidex15](https://github.com/sidex15/susfs4ksu-module) : SUSFS userspace tool.
 - [@osm0sis](https://github.com/osm0sis/AnyKernel3) : AnyKernel3 tools.
