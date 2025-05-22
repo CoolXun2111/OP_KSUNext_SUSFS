@@ -157,8 +157,8 @@ jobs:
           echo "Applying kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch..."
           #cp ../../../kernel_patches/next/fix_kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch ./
           #patch -p1 --forward --verbose < fix_kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch || true
-          cp ../../../kernel_patches/next/0001_susfs_157_for_ksunext.patch ./
-          patch -p1 --forward --verbose < 0001_susfs_157_for_ksunext.patch || true
+          cp ../../../kernel_patches/next/fix_0001_susfs_157_for_ksunext.patch ./
+          patch -p1 --forward --verbose < fix_0001_susfs_157_for_ksunext.patch || true
           ls -l *.rej || true
           cat *.rej || true
           
