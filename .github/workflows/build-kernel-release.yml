@@ -165,7 +165,7 @@ jobs:
         ☯ https://github.com/KernelSU-Next/KernelSU-Next
 
         Features:
-        🔹 KernelSU-Next 
+        🔹 KernelSU-Next 1.0.7
         🔹 SUSFS 1.5.7 
         🔹 Manual Syscall Hooks for Better Hiding
         🔹 Wireguard Support
