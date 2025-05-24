@@ -158,11 +158,14 @@ jobs:
       RELEASE_NOTES: |
         This release contains KernelSU-Next and SUSFS
 
-        Module: 
-        ඞ https://github.com/sidex15/ksu_module_susfs
+        ඞ SUSFS Module: 
+        https://github.com/sidex15/ksu_module_susfs
 
-        KernelSU-Next Managers:
-        ☯ https://github.com/KernelSU-Next/KernelSU-Next
+        ☯ KernelSU-Next Managers:
+        https://github.com/KernelSU-Next/KernelSU-Next
+
+        BBR Module:
+        https://github.com/fatalcoder524/TCP_Optimiser_Module
 
         Features:
         🔹 KernelSU-Next 1.0.7
