@@ -127,16 +127,26 @@ jobs:
           path: ./downloaded-artifacts
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.NEW_TAG }}
-          prerelease: ${{ inputs.set_prerelease }}
-          release_name: ${{ env.RELEASE_NAME }}
+          name: ${{ env.RELEASE_NAME }}
           body: ${{ env.RELEASE_NOTES }}
+          prerelease: ${{ inputs.set_prerelease }}
         env:
-          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
+#      - name: Create GitHub Release
+#        uses: actions/create-release@v1
+#        with:
+#          tag_name: ${{ env.NEW_TAG }}
+#          prerelease: ${{ inputs.set_prerelease }}
+#          release_name: ${{ env.RELEASE_NAME }}
+#          body: ${{ env.RELEASE_NOTES }}
+#        env:
+#          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#
 #      - name: Create GitHub Release with Retry
 #        run: |
 #          set -x
