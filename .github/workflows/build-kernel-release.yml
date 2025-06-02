@@ -233,20 +233,19 @@ jobs:
         with:
           path: ./downloaded-artifacts
 
-      - name: Set PRERELEASE_FLAG
-        run: |
-          if [ "${{ inputs.set_prerelease }}" = "true" ] || [ "${{ inputs.set_prerelease }}" = true ]; then
-            echo "PRERELEASE_FLAG=--prerelease" >> $GITHUB_ENV
-          else
-            echo "PRERELEASE_FLAG=" >> $GITHUB_ENV
-          fi
-
       - name: Create GitHub Release with Retry
         run: |
           set -x
           ATTEMPTS=0
           MAX_ATTEMPTS=3
           DELAY_SECONDS=10
+
+          # flag prerelease
+          if [ "${{ inputs.set_prerelease }}" = "true" ] || [ "${{ inputs.set_prerelease }}" = true ]; then
+            PRERELEASE_FLAG="--prerelease"
+          else
+            PRERELEASE_FLAG=""
+          fi
 
           while true; do
             set +e
@@ -270,7 +269,6 @@ jobs:
             sleep $DELAY_SECONDS
           done
         env:
-          PRERELEASE_FLAG: ${{ inputs.set_prerelease && '--prerelease' || '' }}
           GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           RELEASE_NAME: ${{ env.RELEASE_NAME }}
