@@ -118,8 +118,8 @@ jobs:
           git push origin "$NEW_TAG"
         env:
           TAG_PREFIX: op10pro-n
-          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
@@ -133,8 +133,8 @@ jobs:
           name: ${{ env.RELEASE_NAME }}
           body: ${{ env.RELEASE_NOTES }}
           prerelease: ${{ inputs.set_prerelease }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
 #      - name: Create GitHub Release
 #        uses: actions/create-release@v1
@@ -193,7 +193,7 @@ jobs:
               gh release upload ${{ env.NEW_TAG }} "$file"
           done
         env:
-          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           NEW_TAG: ${{ env.NEW_TAG }}
 
       - name: Display Files Uploaded
