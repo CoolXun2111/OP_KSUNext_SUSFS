@@ -233,52 +233,50 @@ jobs:
         with:
           path: ./downloaded-artifacts
 
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ env.NEW_TAG }}
-          prerelease: ${{ inputs.set_prerelease }}
-          release_name: ${{ env.RELEASE_NAME }}
-          body: ${{ env.RELEASE_NOTES }}
+      - name: Set PRERELEASE_FLAG
+        run: |
+          if [ "${{ inputs.set_prerelease }}" = "true" ] || [ "${{ inputs.set_prerelease }}" = true ]; then
+            echo "PRERELEASE_FLAG=--prerelease" >> $GITHUB_ENV
+          else
+            echo "PRERELEASE_FLAG=" >> $GITHUB_ENV
+          fi
+
+      - name: Create GitHub Release with Retry
+        run: |
+          set -x
+          ATTEMPTS=0
+          MAX_ATTEMPTS=3
+          DELAY_SECONDS=10
+
+          while true; do
+            set +e
+            echo "Attempt $((ATTEMPTS+1)) to create GitHub Release..."
+            gh release create "${{ env.NEW_TAG }}" --title "${{ env.RELEASE_NAME }}" --notes "${{ env.RELEASE_NOTES }}" $PRERELEASE_FLAG
+            EXIT_CODE=$?
+            set -e
+
+            if [ $EXIT_CODE -eq 0 ]; then
+              echo "✅ GitHub Release created successfully!"
+              break
+            fi
+
+            ATTEMPTS=$((ATTEMPTS+1))
+            if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then
+              echo "❌ Failed to create GitHub Release after $MAX_ATTEMPTS attempts."
+              exit 1
+            fi
+
+            echo "⚠️ GitHub Release creation failed (attempt $ATTEMPTS). Retrying in $DELAY_SECONDS seconds..."
+            sleep $DELAY_SECONDS
+          done
         env:
+          PRERELEASE_FLAG: ${{ inputs.set_prerelease && '--prerelease' || '' }}
           GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          RELEASE_NAME: ${{ env.RELEASE_NAME }}
+          RELEASE_NOTES: ${{ env.RELEASE_NOTES }}
+          NEW_TAG: ${{ env.NEW_TAG }}
 
-#      - name: Create GitHub Release with Retry
-#        run: |
-#          set -x
-#          ATTEMPTS=0
-#          MAX_ATTEMPTS=3
-#          DELAY_SECONDS=10
-#
-#          while true; do
-#            set +e
-#            echo "Attempt $((ATTEMPTS+1)) to create GitHub Release..."
-#            gh release create "${{ env.NEW_TAG }}" --title "${{ env.RELEASE_NAME }}" --notes "${{ env.RELEASE_NOTES }}"
-#            EXIT_CODE=$?
-#            set -e
-#
-#            if [ $EXIT_CODE -eq 0 ]; then
-#              echo "✅ GitHub Release created successfully!"
-#              break
-#            fi
-#
-#            ATTEMPTS=$((ATTEMPTS+1))
-#            if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then
-#              echo "❌ Failed to create GitHub Release after $MAX_ATTEMPTS attempts."
-#              exit 1
-#            fi
-#
-#            echo "⚠️ GitHub Release creation failed (attempt $ATTEMPTS). Retrying in $DELAY_SECONDS seconds..."
-#            sleep $DELAY_SECONDS
-#          done
-#        env:
-#          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-#          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-#          RELEASE_NAME: ${{ env.RELEASE_NAME }}
-#          RELEASE_NOTES: ${{ env.RELEASE_NOTES }}
-#          NEW_TAG: ${{ env.NEW_TAG }}
-#
       - name: Upload Release Assets Dynamically
         run: |
           set -x
