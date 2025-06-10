@@ -125,7 +125,6 @@ jobs:
           cd "$CONFIG/kernel_platform"
           
           echo "Adding KernelSU-Next..."
-          #curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/84fdcf8/kernel/setup.sh" | bash -s next  # ksun-12646
           curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s next
           #curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next-susfs/kernel/setup.sh" | bash -s next-susfs
           #curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next-susfs-dev/kernel/setup.sh" | bash -s next-susfs-dev
@@ -177,10 +176,12 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG/kernel_platform/common"
           # Apply additional patch
-          echo "Applying syscall_hooks.patch..."
+          #echo "Applying syscall_hooks.patch..."
           #cp ../../../kernel_patches/next/syscall_hooks.patch ./
-          cp ../../../kernel_patches/scope_min_manual_hooks_v1.4.patch ./syscall_hooks.patch
-          patch -p1 --fuzz=3 --verbose < ./syscall_hooks.patch || true
+          #patch -p1 --fuzz=3 --verbose < ./syscall_hooks.patch || true
+          echo "Applying scope_min_manual_hooks.patch..."
+          cp ../../../kernel_patches/scope_min_manual_hooks_v1.4.patch ./
+          patch -p1 --fuzz=3 --verbose < ./scope_min_manual_hooks_v1.4.patch || true
           ls -l *.rej || true
           cat *.rej || true
           
