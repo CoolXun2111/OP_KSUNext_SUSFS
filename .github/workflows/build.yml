@@ -181,7 +181,7 @@ jobs:
           # Apply additional patch
           echo "Applying syscall_hooks.patch..."
           #cp ../../../kernel_patches/next/syscall_hooks.patch ./
-          cp ../../../kernel_patches/scope_min_manual_hooks_v1.3.patch ./syscall_hooks.patch
+          cp ../../../kernel_patches/scope_min_manual_hooks_v1.4.patch ./syscall_hooks.patch
           patch -p1 --fuzz=3 --verbose < ./syscall_hooks.patch || true
           ls -l *.rej || true
           cat *.rej || true
