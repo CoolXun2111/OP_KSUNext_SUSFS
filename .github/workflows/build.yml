@@ -155,8 +155,8 @@ jobs:
           cd ./KernelSU-Next
           
           echo "Applying kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch..."
-          cp ../../../kernel_patches/next/fix_0001-kernel-patch-susfs-v1.5.7-to-KernelSU-Next-v1.0.7.patch ./
-          patch -p1 --forward --verbose < fix_0001-kernel-patch-susfs-v1.5.7-to-KernelSU-Next-v1.0.7.patch || true
+          cp ../../../kernel_patches/next/ksun_susfs_v1.5.7_patch_12647+.patch ./
+          patch -p1 --forward --verbose < ksun_susfs_v1.5.7_patch_12647+.patch || true
           ls -l *.rej || true
           cat *.rej || true
           
@@ -180,7 +180,7 @@ jobs:
           #cp ../../../kernel_patches/next/syscall_hooks.patch ./
           #patch -p1 --fuzz=3 --verbose < ./syscall_hooks.patch || true
           echo "Applying scope_min_manual_hooks.patch..."
-          cp ../../../kernel_patches/scope_min_manual_hooks_v1.4.patch ./
+          cp ../../../kernel_patches/next/scope_min_manual_hooks_v1.4.patch ./
           patch -p1 --fuzz=3 --verbose < ./scope_min_manual_hooks_v1.4.patch || true
           ls -l *.rej || true
           cat *.rej || true
